@@ -29,11 +29,21 @@ def get_cropped(img, img2):
         counters = cv2.boxPoints(box)
         area = box[1][0] * box[1][1]
         if area > largest_area:
-            bestcounters = counters
+            bestcounters = c
             largest_area = area
+    bestcounters = np.reshape(bestcounters, (-1, 2))
+    x_y_sum = bestcounters[:,0] + bestcounters[:,1]
+    x_y_dif = bestcounters[:,0] - bestcounters[:,1]
+    f_1 = bestcounters[np.argmin(x_y_sum)]
+    f_2 = bestcounters[np.argmax(x_y_sum)]
+    f_3 = bestcounters[np.argmin(x_y_dif)]
+    f_4 = bestcounters[np.argmax(x_y_dif)]
+    
+    
     width, height, _ = img.shape
     dst_points = np.array([[0, 0], [height - 1, 0], [height - 1, width - 1], [0, width - 1]], dtype="float32")
-    M = cv2.getPerspectiveTransform(np.array(bestcounters), dst_points)
+    #print(np.array([f_1, f_4, f_2, f_3]), dst_points)
+    M = cv2.getPerspectiveTransform(np.array([f_1, f_4, f_2, f_3], dtype = "float32"), dst_points)
 
     return cv2.warpPerspective(img, M, (height, width))
 
@@ -56,6 +66,7 @@ class DetermineColor:
         self.image_sub = rospy.Subscriber('/camera/color/image_raw', Image, self.callback)
         self.color_pub = rospy.Publisher('/rotate_cmd', Header, queue_size=10)
         self.bridge = CvBridge()
+        #self.count = 0
 
     def callback(self, data):
         try:
@@ -82,8 +93,10 @@ class DetermineColor:
             img_cropped = get_cropped(image, img_canny)
             msg.frame_id = get_color(img_cropped)
            
+            #cv2.imwrite("data/%06d.jpg"%self.count, image)
 
             # publish color_state
+            #self.count += 1
             self.color_pub.publish(msg)
 
         except CvBridgeError as e:
@@ -98,4 +111,3 @@ if __name__ == '__main__':
     detector = DetermineColor()
     rospy.init_node('CompressedImages1', anonymous=False)
     rospy.spin()
-
