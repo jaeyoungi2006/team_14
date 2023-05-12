@@ -56,7 +56,7 @@ def get_color(img):
     b = np.sum((blue > red * 1.2) & (blue > green * 1.2))
     r = np.sum((red > blue * 1.2) & (red > green * 1.2))
     if b > pixel / 2:
-        return '1'
+        return '+1'
     if r > pixel / 2:
         return '-1'
     return '0'
