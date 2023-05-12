@@ -89,7 +89,7 @@ class DetermineColor:
             # msg.frame_id = '0'  # STOP
             # msg.frame_id = '-1' # CW (Red background)
 
-            img_canny = Canny(image)
+            img_canny = Canny(cv2.medianBlur(image, 3))
             img_cropped = get_cropped(image, img_canny)
             msg.frame_id = get_color(img_cropped)
            
