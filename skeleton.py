@@ -13,7 +13,7 @@ import numpy as np
 def Canny(img):
     color_plane = list(cv2.split(cv2.cvtColor(img, cv2.COLOR_YCrCb2RGB)))
     for index in range(3):
-        color_plane[index] = cv2.Canny(color_plane[index], 150, 150)
+        color_plane[index] = cv2.Canny(color_plane[index], 100, 100)
     return color_plane[0] | color_plane[1] | color_plane[2]
 
 def get_cropped(img, img2):
